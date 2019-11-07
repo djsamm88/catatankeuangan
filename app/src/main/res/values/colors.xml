@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#4a90e2</color>
+    <color name="colorPrimaryDark">#5685bd</color>
+    <color name="colorAccent">#FF5722</color>
+    <color name="kuning">#ffc93d</color>
+    <color name="abuabu">#D6F5F8</color>
+    <color name="border">#DEDEDE</color>
+    <color name="agakDanger">#EDF8ED</color>
+</resources>
