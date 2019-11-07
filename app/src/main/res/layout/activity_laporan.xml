@@ -75,7 +75,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="10"
+        android:weightSum="15"
         android:padding="8dp"
         android:background="@color/abuabu"
         >
@@ -95,6 +95,14 @@
             android:gravity="center"
             />
 
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="Koreksi"
+            android:gravity="center"
+            />
+
 
 
     </LinearLayout>
@@ -104,7 +112,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:weightSum="10"
+        android:weightSum="15"
         android:padding="8dp"
         android:background="@color/agakDanger"
         >
@@ -124,6 +132,16 @@
             android:text="Rp1.000.000"
             android:gravity="center"
             android:id="@+id/t_pengeluaran"
+            />
+
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:text="Rp1.000.000"
+            android:gravity="center"
+            android:id="@+id/t_koreksi"
             />
 
 

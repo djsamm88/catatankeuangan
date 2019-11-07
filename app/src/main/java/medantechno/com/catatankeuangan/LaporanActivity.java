@@ -9,9 +9,13 @@ import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -31,15 +35,20 @@ import medantechno.com.catatankeuangan.model.Transaksi;
 
 public class LaporanActivity extends AppCompatActivity {
 
-    private AdapterTrx adapterTrx;
-    private List<Transaksi> transaksiList = new ArrayList<>();
-    private ListView listView;
-    private ProgressDialog pDialog;
+     AdapterTrx adapterTrx;
+     List<Transaksi> transaksiList = new ArrayList<>();
 
+     ProgressDialog pDialog;
+
+    ListView listView;
     EditText v_awal,v_akhir;
+    TextView t_pemasukan,t_pengeluaran,t_koreksi,t_total;
     SwipeRefreshLayout swipeSuka;
     Calendar myCalendar;
     DatePickerDialog.OnDateSetListener dateTanggal,dateTanggal2;
+
+    Double pemasukan,pengeuaran,koreksi,total;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +63,13 @@ public class LaporanActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         /******** membuat back button *******/
+
+        listView = (ListView)findViewById(R.id.list);
+
+        t_pemasukan = (TextView)findViewById(R.id.t_pemasukan);
+        t_pengeluaran = (TextView)findViewById(R.id.t_pengeluaran);
+        t_total = (TextView)findViewById(R.id.total_semua);
+        t_koreksi = (TextView)findViewById(R.id.t_koreksi);
 
         /****datepicker awal****/
         v_awal = (EditText)findViewById(R.id.spinnerAwal);
@@ -133,8 +149,19 @@ public class LaporanActivity extends AppCompatActivity {
         });
         /****datepicker akhir*****/
 
+        Calendar c = Calendar.getInstance();
+        int tahun = c.get(Calendar.YEAR);
+        int bulan = c.get(Calendar.MONTH);
 
 
+
+        Locale localeID = new Locale("in", "ID");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", localeID);
+
+        String awal_bulan = String.valueOf(tahun)+"-"+String.valueOf(bulan+1)+"-01";
+        String sekarang = sdf.format(c.getTime());
+
+        listTrx(awal_bulan,sekarang);
 
     }
 
@@ -166,7 +193,7 @@ public class LaporanActivity extends AppCompatActivity {
 
 
 
-    private void listTrx()
+    private void listTrx(String awal,String akhir)
     {
 
         pDialog = new ProgressDialog(this);
@@ -181,8 +208,13 @@ public class LaporanActivity extends AppCompatActivity {
                 hidePDialog();
 
                 DbTransaksi dbTransaksi = new DbTransaksi(getApplicationContext());
-                List<Transaksi> transaksis = dbTransaksi.getAll();
+                List<Transaksi> transaksis = dbTransaksi.getAntara(awal,akhir);
                 transaksiList.clear();
+
+                pengeuaran=(double)0;
+                pemasukan=(double)0;
+                total=(double)0;
+                koreksi=(double)0;
 
                 for(Transaksi trx:transaksis)
                 {
@@ -196,7 +228,27 @@ public class LaporanActivity extends AppCompatActivity {
 
                     transaksiList.add(transaksi);
 
+                    if(trx.getJenis().equals("Pengeluaran"))
+                    {
+                        pengeuaran+=trx.getJumlah();
+                    }else if(trx.getJenis().equals("Pemasukan"))
+                    {
+                        pemasukan+=trx.getJumlah();
+                    }else{
+                        koreksi+=trx.getJumlah();
+                    }
+
+                    total+=trx.getJumlah();
+
                 }
+
+                t_pengeluaran.setText(rupiah(pengeuaran));
+                t_pemasukan.setText(rupiah(pemasukan));
+                t_koreksi.setText(rupiah(koreksi));
+                t_total.setText(rupiah(total));
+
+                v_awal.setText(awal);
+                v_akhir.setText(akhir);
 
                 if(transaksis.size()==0)
                 {
@@ -219,6 +271,19 @@ public class LaporanActivity extends AppCompatActivity {
             pDialog.dismiss();
             pDialog = null;
         }
+    }
+
+
+    public String rupiah(double uang)
+    {
+
+        /**** format rupiah ***/
+        Locale localeID = new Locale("in", "ID");
+        NumberFormat formatRupiah = NumberFormat.getCurrencyInstance(localeID);
+        //penggunaan formatRupiah.format();
+        /**** format rupiah ***/
+        return formatRupiah.format(uang);
+
     }
 
 

@@ -106,7 +106,7 @@ public class DbTransaksi extends SQLiteOpenHelper {
 
     public List<Transaksi> getAntara(String awal,String akhir) {
         List<Transaksi> semuanya = new ArrayList<Transaksi>();
-        String selectQuery = "SELECT  * FROM " + table + " WHERE "+tanggal+" BEETWEN DATE("+awal+") AND DATE("+akhir+") ORDER BY DATE("+tanggal+") DESC";
+        String selectQuery = "SELECT  * FROM " + table + " WHERE "+tanggal+" BETWEEN DATE("+awal+") AND DATE("+akhir+") ORDER BY DATE("+tanggal+") DESC";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
