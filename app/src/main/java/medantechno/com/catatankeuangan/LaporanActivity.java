@@ -104,16 +104,21 @@ public class LaporanActivity extends AppCompatActivity {
 
 
 
-                try{
+                try {
                     SimpleDateFormat xxx = new SimpleDateFormat("yyyy-MM-dd");
                     Date tglAntara = xxx.parse(sdf.format(myCalendar.getTime()));
                     Date tglMulai = xxx.parse(v_awal.getText().toString());
                     if (tglMulai.getTime() > tglAntara.getTime()) {
                         //catalog_outdated = 1;
                         System.out.println("ada masalah");
-                        Toast.makeText(getApplicationContext(),"Peringatan!! Tanggal akhir harus lebih besar.",Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Peringatan!! Tanggal akhir harus lebih besar.", Toast.LENGTH_LONG).show();
                         v_akhir.setText("");
                     }
+
+                }catch (Exception e)
+                {
+
+                }
 
             }
 
