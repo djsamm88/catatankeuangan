@@ -134,18 +134,54 @@ public class DbTransaksi extends SQLiteOpenHelper {
 
     public Double saldo()
     {
-        String selectQuery = "SELECT SUM(jumlah) FROM " + table;
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
         Double saldo =(double)0;
-        if (cursor.moveToFirst()) {
+
+        String qPengeluaran = "SELECT SUM(jumlah) FROM " + table+" WHERE jenis='Pengeluaran'";
+        SQLiteDatabase dbP = this.getWritableDatabase();
+        Cursor cPengeluaran = dbP.rawQuery(qPengeluaran, null);
+
+        Double saldoPengeluaran =(double)0;
+        if (cPengeluaran.moveToFirst()) {
             do {
                 //cursor.getInt(0);
-                saldo+=cursor.getDouble(0);
+                saldoPengeluaran+=cPengeluaran.getDouble(0);
 
-            } while (cursor.moveToNext());
+            } while (cPengeluaran.moveToNext());
         }
+
+
+        String qPemasukan = "SELECT SUM(jumlah) FROM " + table+" WHERE jenis='Pemasukan'";
+        SQLiteDatabase dbPemasukan = this.getWritableDatabase();
+        Cursor cPemasukan = dbPemasukan.rawQuery(qPemasukan, null);
+
+        Double saldoPemasukan =(double)0;
+        if (cPemasukan.moveToFirst()) {
+            do {
+                //cursor.getInt(0);
+                saldoPemasukan+=cPemasukan.getDouble(0);
+
+            } while (cPemasukan.moveToNext());
+        }
+
+
+
+
+        String qKoreksi = "SELECT SUM(jumlah) FROM " + table+" WHERE jenis='Koreksi'";
+        SQLiteDatabase dbKoreksi = this.getWritableDatabase();
+        Cursor cKoreksi = dbKoreksi.rawQuery(qKoreksi, null);
+
+        Double saldoKoreksi =(double)0;
+        if (cKoreksi.moveToFirst()) {
+            do {
+                //cursor.getInt(0);
+                saldoKoreksi+=cKoreksi.getDouble(0);
+
+            } while (cKoreksi.moveToNext());
+        }
+
+
+
+        saldo = saldoPemasukan-saldoPengeluaran+(saldoKoreksi);
 
         return saldo;
     }
