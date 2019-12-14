@@ -1,23 +1,40 @@
 package medantechno.com.catatankeuangan;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
 
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import medantechno.com.catatankeuangan.database.DbTransaksi;
 import medantechno.com.catatankeuangan.model.Transaksi;
 
+import android.os.Environment;
 import android.os.StrictMode;
+import android.provider.MediaStore;
+import android.util.Base64;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,16 +54,29 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
+
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -55,6 +85,13 @@ public class MainActivity extends AppCompatActivity {
     Spinner spinJenis;
     DatePickerDialog.OnDateSetListener dateTanggal;
     Button simpan;
+    ImageView refresh,vImg;
+
+
+    private InterstitialAd mInterstitialAd;
+    private AdView mAdView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,11 +99,76 @@ public class MainActivity extends AppCompatActivity {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
 
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        mInterstitialAd = new InterstitialAd(this);
+        mInterstitialAd.setAdUnitId("ca-app-pub-2993509046689702/4220326129");
+        //mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");//testing
+
+        mInterstitialAd.loadAd(new AdRequest.Builder().addTestDevice("FE3B2C85BC57494FB1154697FEB2BF52").build());
+
+        if (mInterstitialAd.isLoaded()) {
+            mInterstitialAd.show();
+        } else {
+            Log.d("TAG", "The interstitial wasn't loaded yet.");
+        }
+
+        mInterstitialAd.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+                System.out.println("iniAds_loaded");
+                //mInterstitialAd.show();
+            }
+
+            @Override
+            public void onAdFailedToLoad(int errorCode) {
+                // Code to be executed when an ad request fails.
+                System.out.println("iniAds_error:"+errorCode);
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when the ad is displayed.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                // Code to be executed when the user has left the app.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the interstitial ad is closed.
+            }
+        });
+
+
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+
+
+
+
         final Button btnTrx = (Button)findViewById(R.id.btnTransaksi);
         btnTrx.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DialogWebview();
+                //DialogWebview();
+                Intent goForm = new Intent(getApplicationContext(),FormActivity.class);
+                startActivity(goForm);
+                mInterstitialAd.show();
+
             }
         });
 
@@ -91,6 +193,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+
+        refresh = (ImageView) findViewById(R.id.refresh);
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                tampilSaldo();
+            }
+        });
+
+
     }
 
     public void tampilSaldo()
@@ -98,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         TextView v_saldo = (TextView)findViewById(R.id.saldo);
         DbTransaksi db = new DbTransaksi(getApplicationContext());
         v_saldo.setText(rupiah(db.saldo()));
+        Toast.makeText(getApplicationContext(),rupiah(db.saldo()).toString(),Toast.LENGTH_SHORT).show();
     }
 
 
@@ -128,7 +241,20 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_tambah) {
+            DialogWebview();
+            return true;
+        }
+
+        if (id == R.id.action_history) {
+            Intent i = new Intent(MainActivity.this,TrxActivity.class);
+            startActivity(i);
+            return true;
+        }
+
+        if (id == R.id.action_laporan) {
+            Intent i = new Intent(MainActivity.this,LaporanActivity.class);
+            startActivity(i);
             return true;
         }
 
@@ -189,7 +315,17 @@ public class MainActivity extends AppCompatActivity {
         v_jumlah = (EditText)tampung.findViewById(R.id.eJumlah);
         v_ket = (EditText)tampung.findViewById(R.id.eKet);
         simpan = (Button)tampung.findViewById(R.id.btnSimpan);
+        vImg = (ImageView)tampung.findViewById(R.id.gbr);
 
+        vImg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //disini nanti ambil gambar
+
+                Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(takePicture, 0);
+            }
+        });
 
 
         alertDialog.setView(tampung);
@@ -254,6 +390,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
+
+
 
 
 }

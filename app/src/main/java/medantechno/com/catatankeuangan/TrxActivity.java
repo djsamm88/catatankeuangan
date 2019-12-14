@@ -71,6 +71,13 @@ public class TrxActivity extends AppCompatActivity {
 
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -78,10 +85,19 @@ public class TrxActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_tambah) {
 
-            Intent i = new Intent(getApplicationContext(),TrxActivity.class);
-            startActivity(i);
+            Intent iii = new Intent(getApplicationContext(),MainActivity.class);
+            startActivity(iii);
+
+            return true;
+        }
+
+        if (id == R.id.action_laporan) {
+
+            Intent ii = new Intent(getApplicationContext(),LaporanActivity.class);
+            startActivity(ii);
+
             return true;
         }
 
@@ -117,6 +133,7 @@ public class TrxActivity extends AppCompatActivity {
                     transaksi.setTanggal(trx.getTanggal());
                     transaksi.setKet(trx.getKet());
                     transaksi.setId(trx.getId());
+                    transaksi.setImg(trx.getImg());
 
                     transaksiList.add(transaksi);
 

@@ -7,12 +7,15 @@
     android:focusableInTouchMode="true"
     android:clickable="true"
     android:id="@+id/layoutnya"
-    android:padding="15dp"
+
     >
 
     <LinearLayout android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        >
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -81,6 +84,31 @@
                 android:gravity="top|left"
                 android:lines="5"
                 android:id="@+id/eKet"/>
+
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ambil Foto struk jika dibutuhkan"
+                android:textStyle="italic"
+                android:textSize="10dp"
+                />
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/gbr"
+                android:src="@drawable/noimage"
+
+                />
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/t4Img"
+                android:visibility="gone"
+                />
+
             <Button
                 style="@style/Widget.AppCompat.Button.Colored"
                 android:layout_width="wrap_content"

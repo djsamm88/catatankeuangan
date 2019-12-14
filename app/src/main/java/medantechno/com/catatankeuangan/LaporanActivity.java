@@ -4,8 +4,10 @@ import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -48,6 +50,8 @@ public class LaporanActivity extends AppCompatActivity {
     DatePickerDialog.OnDateSetListener dateTanggal,dateTanggal2;
 
     Double pemasukan,pengeuaran,koreksi,total;
+
+    Button btnTampil;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,16 +156,53 @@ public class LaporanActivity extends AppCompatActivity {
         Calendar c = Calendar.getInstance();
         int tahun = c.get(Calendar.YEAR);
         int bulan = c.get(Calendar.MONTH);
-
-
-
         Locale localeID = new Locale("in", "ID");
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", localeID);
 
         String awal_bulan = String.valueOf(tahun)+"-"+String.valueOf(bulan+1)+"-01";
         String sekarang = sdf.format(c.getTime());
-
         listTrx(awal_bulan,sekarang);
+
+
+        swipeSuka = findViewById(R.id.swipeSuka);
+        swipeSuka.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Calendar c = Calendar.getInstance();
+                int tahun = c.get(Calendar.YEAR);
+                int bulan = c.get(Calendar.MONTH);
+                Locale localeID = new Locale("in", "ID");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", localeID);
+
+                String awal_bulan = String.valueOf(tahun)+"-"+String.valueOf(bulan+1)+"-01";
+                String sekarang = sdf.format(c.getTime());
+                listTrx(awal_bulan,sekarang);
+                swipeSuka.setRefreshing(false);
+            }
+        });
+
+        btnTampil = (Button)findViewById(R.id.btnTampil);
+        btnTampil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                String awal = v_awal.getText().toString();
+                String akhir = v_akhir.getText().toString();
+                listTrx(awal,akhir);
+
+                swipeSuka = findViewById(R.id.swipeSuka);
+                swipeSuka.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        String awal = v_awal.getText().toString();
+                        String akhir = v_akhir.getText().toString();
+                        listTrx(awal,akhir);
+                        swipeSuka.setRefreshing(false);
+                    }
+                });
+
+            }
+        });
 
     }
 
@@ -174,17 +215,32 @@ public class LaporanActivity extends AppCompatActivity {
 
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        if (id == R.id.action_tambah) {
+            Intent iii = new Intent(LaporanActivity.this,MainActivity.class);
+            startActivity(iii);
+            return true;
+        }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_history) {
+            Intent ii = new Intent(LaporanActivity.this,TrxActivity.class);
+            startActivity(ii);
+            return true;
+        }
 
-            Intent i = new Intent(getApplicationContext(), LaporanActivity.class);
-            startActivity(i);
+        if (id == R.id.action_laporan) {
+
             return true;
         }
 
@@ -225,22 +281,33 @@ public class LaporanActivity extends AppCompatActivity {
                     transaksi.setTanggal(trx.getTanggal());
                     transaksi.setKet(trx.getKet());
                     transaksi.setId(trx.getId());
+                    transaksi.setImg(trx.getImg());
 
-                    transaksiList.add(transaksi);
 
-                    if(trx.getJenis().equals("Pengeluaran"))
-                    {
-                        pengeuaran+=trx.getJumlah();
-                    }else if(trx.getJenis().equals("Pemasukan"))
-                    {
-                        pemasukan+=trx.getJumlah();
-                    }else{
-                        koreksi+=trx.getJumlah();
+                    int cAwal = Integer.parseInt(awal.replaceAll("\\D+",""));
+                    int cAkhir = Integer.parseInt(akhir.replaceAll("\\D+",""));
+
+                    int hTgl = Integer.parseInt(trx.getTanggal().replaceAll("\\D+",""));
+
+                    if(hTgl>=cAwal && hTgl<=cAkhir) {
+
+                        transaksiList.add(transaksi);
+
+                        if (trx.getJenis().equals("Pengeluaran")) {
+                            pengeuaran += trx.getJumlah();
+                        } else if (trx.getJenis().equals("Pemasukan")) {
+                            pemasukan += trx.getJumlah();
+                        } else {
+                            koreksi += trx.getJumlah();
+                        }
                     }
 
-                    total+=trx.getJumlah();
+
+
 
                 }
+
+                total+=pemasukan-pengeuaran+(koreksi);
 
                 t_pengeluaran.setText(rupiah(pengeuaran));
                 t_pemasukan.setText(rupiah(pemasukan));

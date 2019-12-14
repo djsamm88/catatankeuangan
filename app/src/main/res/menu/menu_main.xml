@@ -3,8 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="medantechno.com.catatankeuangan.MainActivity">
     <item
-        android:id="@+id/action_settings"
+        android:id="@+id/action_tambah"
         android:orderInCategory="100"
-        android:title="@string/action_settings"
+        android:title="Tambah Transaksi"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_history"
+        android:orderInCategory="100"
+        android:title="History Transaksi"
+        app:showAsAction="never" />
+
+
+    <item
+        android:id="@+id/action_laporan"
+        android:orderInCategory="100"
+        android:title="Laporan Transaksi"
         app:showAsAction="never" />
 </menu>

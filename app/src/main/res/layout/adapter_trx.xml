@@ -69,6 +69,8 @@
                 android:textStyle="bold" />
 
 
+
+
         </LinearLayout>
 
 
@@ -76,15 +78,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/linear_klik2"
+        android:weightSum="10"
         >
 
         <TextView
             android:id="@+id/v_ket"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="7"
             android:padding="5dp"
             android:text="Uang belanja"
              />
+
+        <TextView
+            android:id="@+id/v_bukti"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:text="Struk"
+            android:textSize="10dp"
+            android:gravity="end"
+            />
     </LinearLayout>
 
 

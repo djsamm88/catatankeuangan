@@ -14,7 +14,7 @@ import medantechno.com.catatankeuangan.model.Transaksi;
 
 
 public class DbTransaksi extends SQLiteOpenHelper {
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     private static final String DATABASE_NAME = "transaksi.db";
 
@@ -25,6 +25,7 @@ public class DbTransaksi extends SQLiteOpenHelper {
     private static final String jumlah = "jumlah";
     private static final String tanggal = "tanggal";
     private static final String ket = "ket";
+    private static final String img = "img";
 
     public DbTransaksi(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -34,7 +35,7 @@ public class DbTransaksi extends SQLiteOpenHelper {
     // membuat Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_CONTACTS_TABLE = "CREATE TABLE  "+table+" ("+id+" INTEGER PRIMARY KEY AUTOINCREMENT,"+jenis+" TEXT,"+jumlah+" TEXT,"+tanggal+" TEXT,"+ket+" TEXT)";
+        String CREATE_CONTACTS_TABLE = "CREATE TABLE  "+table+" ("+id+" INTEGER PRIMARY KEY AUTOINCREMENT,"+jenis+" TEXT,"+jumlah+" TEXT,"+tanggal+" TEXT,"+ket+" TEXT,"+img+" TEXT)";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
 
@@ -59,9 +60,12 @@ public class DbTransaksi extends SQLiteOpenHelper {
         values.put(jumlah,transaksi.getJumlah());
         values.put(tanggal,transaksi.getTanggal());
         values.put(ket,transaksi.getKet());
+        values.put(img,transaksi.getImg());
         db.insertOrThrow(table, null, values);
         //db.insert(table,null,values);
         db.close();
+
+        System.out.println(transaksi.getImg());
     }
 
 
@@ -75,6 +79,7 @@ public class DbTransaksi extends SQLiteOpenHelper {
         values.put(jumlah,transaksi.getJumlah());
         values.put(tanggal,transaksi.getTanggal());
         values.put(ket,transaksi.getKet());
+        values.put(img,transaksi.getImg());
 
         db.update(table, values, id+"=?",new String[]{String.valueOf(transaksi.getId())});
         //db.insert(table,null,values);
@@ -97,6 +102,9 @@ public class DbTransaksi extends SQLiteOpenHelper {
                 transaksi.setJumlah(cursor.getDouble(2));
                 transaksi.setTanggal(cursor.getString(3));
                 transaksi.setKet(cursor.getString(4));
+                transaksi.setImg(cursor.getString(5));
+
+                //System.out.println(cursor.getString(5));
                 semuanya.add(transaksi);
             } while (cursor.moveToNext());
         }
@@ -106,13 +114,15 @@ public class DbTransaksi extends SQLiteOpenHelper {
 
     public List<Transaksi> getAntara(String awal,String akhir) {
 
-        awal = awal.replaceAll("\\D+","");
-        akhir = akhir.replaceAll("\\D+","");
+        //awal = awal.replaceAll("\\D+","");
+        //akhir = akhir.replaceAll("\\D+","");
 
+        //akhir = "2019-12-06";
         List<Transaksi> semuanya = new ArrayList<Transaksi>();
-        String selectQuery = "SELECT  * FROM " + table + " WHERE tanggal>="+awal+" AND tanggal<="+akhir+" ORDER BY DATE("+tanggal+") DESC";
-        System.out.println(selectQuery);
-        //String selectQuery = "SELECT  * FROM " + table + " ORDER BY DATE("+tanggal+") DESC";
+        //String selectQuery = "SELECT  * FROM " + table + " WHERE tanggal BETWEEN "+awal+" AND "+akhir+" ORDER BY DATE("+tanggal+") DESC";
+        //String selectQuery = "SELECT  * FROM " + table + " WHERE replace(tanggal,'-','')>="+awal+" AND replace(tanggal,'-','')<="+akhir+" ORDER BY DATE("+tanggal+") DESC";
+        //System.out.println(selectQuery);
+        String selectQuery = "SELECT  * FROM " + table + " ORDER BY DATE("+tanggal+") DESC";
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
@@ -125,7 +135,11 @@ public class DbTransaksi extends SQLiteOpenHelper {
                 transaksi.setJumlah(cursor.getDouble(2));
                 transaksi.setTanggal(cursor.getString(3));
                 transaksi.setKet(cursor.getString(4));
+                transaksi.setImg(cursor.getString(5));
                 semuanya.add(transaksi);
+
+                System.out.println(cursor.getString(3));
+
             } while (cursor.moveToNext());
         }
 
@@ -213,6 +227,7 @@ public class DbTransaksi extends SQLiteOpenHelper {
                 transaksi.setJumlah(cursor.getDouble(2));
                 transaksi.setTanggal(cursor.getString(3));
                 transaksi.setKet(cursor.getString(4));
+                transaksi.setImg(cursor.getString(5));
 
                 semuanya.add(transaksi);
             } while (cursor.moveToNext());
